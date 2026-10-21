@@ -1,0 +1,18 @@
+# Install as ~/.config/systemd/user/now-playing.service.
+# These defaults assume the project is ~/now-playing; adapt paths if needed.
+[Unit]
+Description=Room music recognition and HDMI now-playing service
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+WorkingDirectory=%h/now-playing
+ExecStart=%h/now-playing/.venv/bin/now-playing --config %h/now-playing/config.toml
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=20
+NoNewPrivileges=true
+UMask=0077
+
+[Install]
+WantedBy=default.target

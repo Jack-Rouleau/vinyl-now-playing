@@ -1,0 +1,33 @@
+# Local environments and build products
+.venv/
+.venv-*/
+venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+node_modules/
+.ruff_cache/
+.coverage
+htmlcov/
+# User configuration and album/model data
+config.toml
+config.*.generated.toml
+models/
+data/
+.now-playing/
+.env
+.env.*
+# Local captures, logs, screenshots, and agent notes
+output/
+artifacts/
+*.log
+.superpowers/
+.worktrees/
+.agents/
+.codex/
+docs/superpowers/
+docs/verification.md
+.DS_Store
+Thumbs.db

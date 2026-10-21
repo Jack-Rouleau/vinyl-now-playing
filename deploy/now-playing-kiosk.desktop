@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=Now Playing display
+Comment=Open the HDMI now-playing display
+# Replace YOUR_USER and adjust the project path before installing.
+Exec=/home/YOUR_USER/now-playing/deploy/start-kiosk.sh
+Terminal=false

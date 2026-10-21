@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "room-now-playing"
+version = "0.1.0"
+description = "Microphone-driven music recognition and an HDMI now-playing display"
+requires-python = ">=3.11"
+readme = "README.md"
+dependencies = []
+
+[project.optional-dependencies]
+live = ["aiohttp>=3.10,<4", "numpy>=1.26,<3", "sounddevice>=0.5,<1", "shazamio>=0.8,<1", "tensorflow>=2.16,<3"]
+test = ["numpy>=1.26,<3", "aiohttp>=3.10,<4"]
+dev = ["build>=1,<2", "ruff>=0.12,<1", "numpy>=1.26,<3", "aiohttp>=3.10,<4"]
+
+[project.scripts]
+now-playing = "now_playing.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+now_playing = ["web/*"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["output", "models", "data"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F", "I"]

@@ -1,0 +1,59 @@
+name: Checks
+on: [push, pull_request]
+jobs:
+  core:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python: ['3.11', '3.12']
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install -e ".[dev]"
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: python -m unittest discover -s tests
+      - run: node tests/test_display.cjs
+      - run: node tests/test_mosaic.cjs
+      - run: node tests/test_mosaic_refresh.cjs
+      - run: python -m build
+      - name: Install wheel in a clean environment and smoke test
+        shell: bash
+        run: |
+          python -m venv .venv-smoke
+          if [ "$RUNNER_OS" = Windows ]; then PY=.venv-smoke/Scripts/python.exe; else PY=.venv-smoke/bin/python; fi
+          "$PY" -m pip install dist/*.whl
+          "$PY" tests/smoke_package.py
+  browser:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install .
+      - run: npm install --no-save --package-lock=false playwright
+      - run: npx playwright install --with-deps chromium
+      - name: Exercise display in Chromium
+        run: |
+          mkdir -p output/playwright
+          python -m now_playing --demo --demo-state idle --port 8081 > output/browser-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID"' EXIT
+          python -c 'import time, urllib.request; time.sleep(2); urllib.request.urlopen("http://127.0.0.1:8081/")'
+          node tests/browser_mosaic.cjs
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: browser-output
+          path: output/

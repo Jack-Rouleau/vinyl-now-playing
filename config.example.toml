@@ -1,0 +1,24 @@
+# Copy to config.toml. Omit device to use the default input.
+# device = "USB Audio Device"
+# device = 1
+host = "127.0.0.1"
+port = 8080
+# capture_rate = 48000  # omit to use the microphone’s native rate
+channels = 1
+model_path = "models/yamnet"
+music_threshold = 0.1
+silence_db = -50.0
+positive_windows = 2
+sample_seconds = 10
+attempt_interval = 10
+silence_seconds = 30
+track_expiry = 90
+request_timeout = 15
+max_backoff = 120
+
+# Deadlines for supervised ML worker startup and each window.
+inference_timeout = 10
+model_startup_timeout = 120
+
+# Persistent unique albums and local artwork cache.
+state_dir = "data"
