@@ -40,9 +40,11 @@ def demo_albums() -> dict:
     }
 
 
-async def run_application(config: Config, options: RunOptions) -> None:
+async def run_application(
+    config: Config, options: RunOptions, *, stop: asyncio.Event | None = None
+) -> None:
     source = Demo(fixed=options.demo_state) if options.demo else Engine(config, time.monotonic)
-    stop = asyncio.Event()
+    stop = stop if stop is not None else asyncio.Event()
     archive = store = None
     if not options.demo:
         source.capture_failed()
