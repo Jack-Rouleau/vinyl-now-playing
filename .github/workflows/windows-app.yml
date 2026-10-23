@@ -49,6 +49,9 @@ jobs:
           $install = Start-Process -FilePath $installer -ArgumentList @('/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', "/DIR=`"$destination`"") -Wait -PassThru
           if ($install.ExitCode -ne 0) { throw "Installer failed: $($install.ExitCode)" }
           $report = Join-Path $PWD 'installed-smoke.json'
+          # Prove the installed app does not find Python or developer tools on PATH.
+          $env:PATH = "$env:SystemRoot\System32;$env:SystemRoot"
+          Remove-Item Env:PYTHONHOME, Env:PYTHONPATH -ErrorAction SilentlyContinue
           $check = Start-Process -FilePath (Join-Path $destination 'Now Playing.exe') -ArgumentList @('--self-test', $report) -Wait -PassThru
           if (Test-Path $report) { Get-Content $report }
           if ($check.ExitCode -ne 0 -or -not (Test-Path $report)) { throw 'Installed application smoke failed' }
