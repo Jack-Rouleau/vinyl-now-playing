@@ -133,6 +133,7 @@ class DesktopService:
             )
         except OSError:
             log = ""
+        log = log.rsplit("listener could not start", 1)[-1]
         if "microphone access denied" in log:
             message = "Windows reported microphone access denied. Click Microphone settings and allow desktop apps to use your microphone, then click Start."
         elif any(word in log for word in ("microphone", "portaudio", "input device")):

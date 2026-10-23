@@ -98,3 +98,12 @@ class DesktopTests(unittest.TestCase):
                 self.assertNotEqual(process.exitcode, 0)
             finally:
                 service.stop()
+
+    def test_failure_help_uses_latest_error_instead_of_old_microphone_logs(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            (root / "listener.log").write_text(
+                "INFO Microphone: USB microphone\nERROR Listener could not start\nRuntimeError: Cannot load YAMNet model\n"
+            )
+            service = DesktopService(root)
+            self.assertIn("music detector could not start", service.failure_message())
