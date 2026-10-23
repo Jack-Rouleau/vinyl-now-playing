@@ -4,11 +4,23 @@ Listen to music through a microphone and show the song, artist, album, and cover
 
 No Spotify account, playlists, or special display hardware. Recognition uses Shazam through ShazamIO; music detection runs locally with YAMNet. An internet connection is needed for setup, identification, and new covers.
 
-## Start here
+## Windows: install the app
 
-1. Install **Python 3.12, 64-bit**, from [python.org](https://www.python.org/downloads/). Python 3.11 also works. On Windows, include the Python launcher (`py`) when installing.
-2. Download and extract this project into a folder you can write to. Keep all its files together.
-3. Connect a microphone and select it as the system input. Open a terminal in the extracted project folder and run the command for your computer:
+Use **Now-Playing-Windows-Setup.exe**, supplied by the project owner or downloaded from [Releases](https://github.com/Jack-Rouleau/vinyl-now-playing/releases). The source-code ZIP from the green Code button is for developers; it is not the app installer.
+
+1. Open the installer and click **Install**.
+2. Open **Now Playing** from the Start menu.
+3. Allow microphone access if Windows asks, then play music nearby.
+
+Your browser opens the display automatically. The app window shows progress while the music detector starts, which can take a minute. Choose another microphone in that window if needed. Close the app window to stop listening; open it from the Start menu next time.
+
+**No Python installation, terminal, account, or setup commands are needed.** Python, audio/recognition dependencies, Microsoft runtime DLLs, and the detector are bundled. Internet is needed to identify songs and fetch new covers. Album history survives upgrades and uninstall/reinstall. The preview installer is unsigned, so Windows may display a publisher warning. Use a build supplied by the project owner or the repository's release page.
+
+Windows x64 is the first packaged target. The installer and installed executable are tested on a Windows build runner, including spawned TensorFlow inference, audio-library loading, native window startup, browser assets, and shutdown. Physical microphone/identification testing on a Windows computer remains necessary. An installer is available to friends once its build has passed and the owner has supplied or published it; downloading the repository alone does not produce one.
+
+## Run from source (developers and other platforms)
+
+The following path requires **Python 3.12, 64-bit**, from [python.org](https://www.python.org/downloads/) (3.11 also works). It is useful for development and platforms without a packaged build. On Windows, include the Python launcher (`py`). Extract the source into a writable folder and open a terminal there:
 
 | Computer | Command |
 | --- | --- |
@@ -16,11 +28,9 @@ No Spotify account, playlists, or special display hardware. Recognition uses Sha
 | Windows, PowerShell | `.\start.cmd` |
 | Windows, Command Prompt | `start.cmd` |
 
-On macOS you can also open `start.command`; on Windows you can open `start.cmd`. If macOS blocks the downloaded script, use the terminal command above.
+The first source run creates a private `.venv`, installs dependencies, downloads the detector, and creates `config.toml`. This can take several minutes. Later runs reuse setup. Source setup never installs system packages or requests administrator access.
 
-The first run creates a private `.venv`, installs dependencies, downloads the music detector, and creates `config.toml`. This can take several minutes and requires space for TensorFlow and its dependencies. Later runs reuse this setup. The launcher never installs system packages or requests administrator access.
-
-Allow microphone access when asked. Your browser opens at **http://127.0.0.1:8080**. Allow model startup, then play music near the microphone. Identification usually needs 10–30 seconds of clear music and can take longer on slower hardware or networks. Use the browser's full-screen mode on your HDMI screen. Keep the terminal open; press **Ctrl+C** there to stop.
+Allow microphone access for the launching terminal. The source display opens at **http://127.0.0.1:8080**. Allow model startup, then 10–30 seconds of clear music for identification; slower hardware or networks can take longer. Use browser full-screen mode on the HDMI screen. Keep the terminal open and press **Ctrl+C** there to stop.
 
 ### Linux preparation
 
@@ -71,7 +81,7 @@ Use a modern browser and a 64-bit operating system. CPU inference is sufficient;
 | Platform | Status |
 | --- | --- |
 | Apple Silicon macOS | Live microphone, model, identification, persistence, and browser tested locally |
-| Windows x86-64 | Native launcher and signal handling implemented; hardware test still needed |
+| Windows x86-64 | Self-contained desktop installer; frozen model/UI/lifecycle checked in build workflow; physical microphone test still needed |
 | Linux x86-64 | Target platform; hardware test still needed |
 | Linux ARM64 / Raspberry Pi OS 64-bit | Target platform; exact Pi, microphone, and performance still to be tested |
 | Intel macOS | Demo works; current live dependencies are incompatible with the last Intel TensorFlow wheels |
@@ -80,6 +90,8 @@ Use a modern browser and a 64-bit operating system. CPU inference is sufficient;
 Python 3.11/3.12 are the launcher targets. CI is configured to check unit tests, packaging, and demo startup on macOS, Windows, and Linux; those checks do not validate microphones or TensorFlow on each platform. TensorFlow's [installation requirements](https://www.tensorflow.org/install/pip) apply, including the Microsoft Visual C++ runtime on Windows. Pi performance depends on the eventual hardware choice.
 
 ## Data and recognition
+
+The Windows installed app keeps album history and logs under `%LOCALAPPDATA%\NowPlaying`, outside its installation folder. Use the app window to select inputs and stop/start listening. Its display port is chosen automatically. It does not read the source tree’s `config.toml` or migrate its `data/` automatically.
 
 The source launcher keeps everything inside the project folder:
 

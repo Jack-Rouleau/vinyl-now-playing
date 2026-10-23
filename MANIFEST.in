@@ -1,6 +1,7 @@
 include run.py bootstrap.py start.sh start.command start.cmd config.example.toml .gitattributes .gitignore
 include docs/architecture.md docs/configuration.md docs/development.md docs/troubleshooting.md docs/raspberry-pi.md
 recursive-include scripts *.py *.sh
+recursive-include packaging *.py *.spec *.iss *.txt
 recursive-include deploy *.service *.desktop *.sh
 recursive-include tests *.py *.cjs
 recursive-include src/now_playing/web *

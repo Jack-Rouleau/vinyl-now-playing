@@ -15,3 +15,5 @@
 `model_setup.py` downloads the official model to a temporary directory, restricts archive members and sizes, validates required files, and activates the staged directory only after validation. A complete existing installation is reused. Model structural validation is not a cryptographic integrity guarantee.
 
 Demo mode uses the same server/UI with synthetic state and sample artwork. It imports no microphone, NumPy, TensorFlow, or recognition packages. Tests exercise the engine with fake clocks, boundaries with injected collaborators, model extraction with local archives, HTTP behavior, and frontend lifecycle in Node and a real browser.
+
+The packaged Windows entry calls `freeze_support` before importing the desktop UI. `desktop.py` owns a Tk control window; `desktop_service.py` owns the independently spawned backend and its stop pipe. The same `run_application` composition accepts an optional stop event, preserving CLI signals while supporting a console-free app. `desktop_smoke.py` validates the actual frozen bundle on Windows. PyInstaller and Inno Setup run only at build time; users receive the complete installer.

@@ -42,6 +42,10 @@ def self_test(destination: Path) -> int:
             async def inference():
                 async with ProcessDetector(config) as detector:
                     assert not await detector.classify(np.zeros(16000, dtype=np.float32))
+                    waveform = (
+                        np.sin(np.arange(16000, dtype=np.float32) * (440 * 2 * np.pi / 16000)) * 0.3
+                    )
+                    assert isinstance(await detector.classify(waveform), bool)
                 async with Recognizer() as recognizer:
                     samples = (
                         np.sin(np.arange(160000, dtype=np.float32) * (440 * 2 * np.pi / 16000))
@@ -53,7 +57,7 @@ def self_test(destination: Path) -> int:
                     assert signature is not None
 
             asyncio.run(inference())
-            results.append("Spawned bundled TensorFlow loads model and classifies silence")
+            results.append("Spawned bundled TensorFlow loads model and executes inference")
             results.append(
                 "Bundled ShazamIO Rust fingerprints in-memory WAV without external decoder"
             )

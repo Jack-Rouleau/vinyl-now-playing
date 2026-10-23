@@ -191,7 +191,7 @@ class DesktopWindow:
                     text = (
                         "Starting the music detector…"
                         if time.monotonic() - self.started_at < 30
-                        else "Waiting for microphone. Check microphone access in Windows Settings."
+                        else "Still starting or waiting for microphone. Check microphone access if this continues."
                     )
                 else:
                     text = labels.get(activity, "Listening for music")

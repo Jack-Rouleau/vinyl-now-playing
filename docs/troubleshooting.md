@@ -1,6 +1,12 @@
 # Troubleshooting
 
-Keep the terminal open and read the first error above “Setup failed.” Correct the problem and rerun your normal start command. Partial dependency installs are retried; existing settings and albums are preserved.
+## Installed Windows app
+
+Open **Now Playing** from the Start menu. It starts listening and opens the display automatically. If it cannot hear anything, choose a microphone in the app window and click **Microphone settings** to enable desktop-app access. Allow a minute for initial model loading. Click **Stop**, then **Start** to retry; close the app to stop everything. Your browser tab alone does not control the microphone listener.
+
+If startup fails, the app shows an error window. Logs for the project owner are in `%LOCALAPPDATA%\NowPlaying\listener.log`; users do not need to run terminal commands. Reinstalling preserves the album collection. Windows may show an unsigned-publisher warning for this preview; obtain the installer only from the project owner or its GitHub release. The source-code ZIP is not the installer.
+
+The remaining sections describe **source/developer launches**. Keep the terminal open and read the first error above “Setup failed.” Correct the problem and rerun your normal start command. Partial dependency installs are retried; existing settings and albums are preserved.
 
 ## Python or dependency installation
 
