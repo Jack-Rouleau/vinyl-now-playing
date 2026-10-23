@@ -126,14 +126,28 @@ class DesktopService:
 
     def failure_message(self) -> str:
         try:
-            lines = (
+            log = (
                 (self.profile / "listener.log")
-                .read_text(encoding="utf-8", errors="replace")
-                .splitlines()
+                .read_text(encoding="utf-8", errors="replace")[-16000:]
+                .lower()
             )
-            return "\n".join(lines[-8:])
         except OSError:
-            return "The listener could not start. Connect a microphone and check Windows microphone permissions."
+            log = ""
+        if "microphone access denied" in log:
+            message = "Windows reported microphone access denied. Click Microphone settings and allow desktop apps to use your microphone, then click Start."
+        elif any(word in log for word in ("microphone", "portaudio", "input device")):
+            message = "The microphone is unavailable. Connect a microphone, select it in the app, and check Microphone settings. Then click Start."
+        elif any(word in log for word in ("yamnet", "tensorflow", "model")):
+            message = "The music detector could not start. Close and reopen Now Playing. If this continues, reinstall the app; your album history will be kept."
+        elif "already in use" in log:
+            message = "The display could not open. Close the app and open it again to retry."
+        else:
+            message = "Now Playing could not start. Close and reopen the app, then try again."
+        return (
+            message
+            + "\n\nIf you need help, send the project owner this log file:\n"
+            + str(self.profile / "listener.log")
+        )
 
     def stop(self) -> None:
         if self.process is None:

@@ -43,6 +43,8 @@ class DesktopTests(unittest.TestCase):
             service.process = Mock()
             service.process.exitcode = 1
             self.assertIn("microphone access denied", service.failure_message())
+            self.assertNotIn("Traceback", service.failure_message())
+            self.assertIn("Microphone settings", service.failure_message())
 
     def test_parent_disconnect_stops_async_worker_without_windows_signals(self):
         import asyncio
