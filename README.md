@@ -6,7 +6,7 @@ No Spotify account, playlists, or special display hardware. Recognition uses Sha
 
 ## Windows: install the app
 
-Use **Now-Playing-Windows-Setup.exe**, supplied by the project owner or downloaded from [Releases](https://github.com/Jack-Rouleau/vinyl-now-playing/releases). The source-code ZIP from the green Code button is for developers; it is not the app installer.
+**[Download the Windows installer](https://github.com/Jack-Rouleau/vinyl-now-playing/releases/download/v0.2.0/Now-Playing-Windows-Setup.exe)** (Windows x64 preview, about 308 MB). The source-code ZIP from the green Code button is for developers; it is not the app installer.
 
 1. Open the installer and click **Install**.
 2. Open **Now Playing** from the Start menu.
