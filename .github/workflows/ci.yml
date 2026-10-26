@@ -44,7 +44,7 @@ jobs:
           node-version: '22'
       - run: python -m pip install .
       - run: npm install --no-save --package-lock=false playwright
-      - run: npx playwright install --with-deps chromium
+      - run: google-chrome --version
       - name: Exercise display in Chromium
         run: |
           mkdir -p output/playwright
@@ -52,7 +52,7 @@ jobs:
           SERVER_PID=$!
           trap 'kill "$SERVER_PID"' EXIT
           python -c 'import time, urllib.request; time.sleep(2); urllib.request.urlopen("http://127.0.0.1:8081/")'
-          node tests/browser_mosaic.cjs
+          BROWSER_CHANNEL=chrome node tests/browser_mosaic.cjs
       - uses: actions/upload-artifact@v4
         if: failure()
         with:
