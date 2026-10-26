@@ -1,6 +1,6 @@
 ; Per-user install: Python, native dependencies, and model are already bundled.
 #ifndef AppVersion
-  #define AppVersion "0.2.0"
+  #define AppVersion "0.3.0"
 #endif
 [Setup]
 AppId={{A95D64A6-375C-4E89-965B-A5C981A0454E}

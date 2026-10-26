@@ -9,7 +9,7 @@ class Element {
   setAttribute(name, value) { this[name] = value; }
   removeAttribute(name) { delete this[name]; }
 }
-for (const id of ['title','artist','album','artwork','track','activity','activity-text']) elements.set(id, new Element());
+for (const id of ['title','artist','album','artwork','track','activity','activity-text','next-song','next-title']) elements.set(id, new Element());
 const document = {getElementById: id => elements.get(id), body: new Element()};
 let now = 0;
 let response = {status:'matched',activity:'music_detected',revision:1,track:{id:'1',title:'<b>literal title</b>',artist:'An artist',album:null,artwork_url:null}};
@@ -56,8 +56,18 @@ vm.runInContext(source,context);
   response={...response,revision:5,track:{...response.track,artwork_url:'https://is1-ssl.mzstatic.com/image/thumb/cover.jpg/3000x3000bb.jpg'}};
   await timers.shift()();
   assert.equal(elements.get('artwork').src,'https://is1-ssl.mzstatic.com/image/thumb/cover.jpg/3000x3000bb.jpg');
-  response={status:'idle',track:null,revision:6}; await timers.shift()();
+  response = {...response, revision:6, inferred:true, next_track:{title:'Next <song>'}};
+  await timers.shift()();
+  assert.equal(elements.get('title').textContent, '💿 ' + response.track.title);
+  assert.equal(elements.get('next-song').hidden, false);
+  assert.equal(elements.get('next-title').textContent, 'Next <song>');
+  response = {...response, revision:7, inferred:false, next_track:null};
+  await timers.shift()();
+  assert.equal(elements.get('title').textContent, response.track.title);
+  assert.equal(elements.get('next-song').hidden, true);
+  response={status:'idle',track:null,revision:8}; await timers.shift()();
   assert.equal(elements.get('track').hidden,true);
   assert.equal(elements.get('activity-text').textContent,'Listening');
+  assert.equal(elements.get('next-song').hidden,true);
   console.log('Display behavior checks passed (metadata, fallback, offline, reconnect, idle).');
 })().catch(e=>{console.error(e);process.exitCode=1});

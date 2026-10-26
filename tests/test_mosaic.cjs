@@ -21,7 +21,7 @@ growing.update(Array.from({length:101},(_,i)=>album(i)));
 assert.equal(growing.next(1)[0].id,'40');
 console.log('Collection growth preserves rotation position.');
 (async()=>{
-  global.document={hidden:false,addEventListener(){}};
+  global.document={hidden:false,addEventListener(){},getElementById(){return null;}};
   global.window={addEventListener(){}};
   global.matchMedia=()=>({matches:true,addEventListener(){}});
   const errors=[];
@@ -39,7 +39,7 @@ console.log('Collection growth preserves rotation position.');
   const mosaic=new global.AlbumMosaic({});
   mosaic.visible=true;mosaic.queue.update([album(1),album(2)]);
   mosaic.preload=async item=>{if(item.id==='1'){mosaic.broken.add('1');return null;}return {remove(){}}};
-  const cell={album:null,element:{firstElementChild:null,append(){}}};
+  const cell={album:null,element:{firstElementChild:null,append(){},setAttribute(){}}};
   await mosaic.paint(cell,album(1),0);
   try {assert.equal(cell.album,'2','reduced-motion initial holes must be refilled');} catch(error) {errors.push(error);}
   if(errors.length) throw new AggregateError(errors,'Mosaic recovery failed');

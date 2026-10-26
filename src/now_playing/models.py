@@ -10,6 +10,13 @@ class Track:
     artist: str
     album: str | None = None
     artwork_url: str | None = None
+    position_seconds: float | None = None
+
+
+@dataclass(frozen=True)
+class AlbumTrack:
+    track: Track
+    duration: float
 
 
 @dataclass(frozen=True)
@@ -18,6 +25,8 @@ class DisplayState:
     track: Track | None = None
     revision: int = 0
     activity: str = "listening"
+    next_track: Track | None = None
+    inferred: bool = False
 
     def to_dict(self) -> dict:
         return asdict(self)

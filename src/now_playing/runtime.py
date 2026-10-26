@@ -20,9 +20,12 @@ class LiveRuntime:
         detector: Classifier | None,
         recognizer: SongRecognizer,
         archive: AlbumSink | None = None,
+        tracklists=None,
     ):
         self.config, self.engine = config, engine
         self.archive = archive
+        self.tracklists = tracklists
+        self.enrichment = None
         self.detector, self.recognizer = detector, recognizer
         self.request = None
         self.last_window = time.monotonic()
@@ -36,13 +39,18 @@ class LiveRuntime:
             self.request = asyncio.create_task(self._recognize(token, samples))
 
     async def _recognize(self, token, samples):
+        captured_at = self.engine.clock() - len(samples) / 16000
         try:
             log.info("Identifying the last %s seconds of music…", self.config.sample_seconds)
             async with asyncio.timeout(self.config.request_timeout):
                 track = await self.recognizer.recognize(samples, 16000)
-            accepted = self.engine.complete(token, track)
+            accepted = self.engine.complete(token, track, captured_at=captured_at)
             if accepted and self.archive:
                 self.archive.submit(track)
+            if accepted and self.tracklists:
+                if self.enrichment is not None:
+                    self.enrichment.cancel()
+                self.enrichment = asyncio.create_task(self._enrich(token, track))
             if track is not None:
                 log.info("Recognition result: %s — %s", track.artist, track.title)
             else:
@@ -52,6 +60,15 @@ class LiveRuntime:
         except Exception as error:
             log.warning("Recognition unavailable (%s); retrying with backoff", type(error).__name__)
             self.engine.complete(token, None, failed=True)
+
+    async def _enrich(self, token, track):
+        try:
+            tracks = await self.tracklists.resolve(track)
+            self.engine.set_tracklist(token, tracks)
+        except asyncio.CancelledError:
+            raise
+        except Exception:
+            log.debug("Album metadata unavailable; recognition continues", exc_info=True)
 
     async def consume(self, capture):
         buffer = AudioBuffer(self.config.sample_seconds)
@@ -93,14 +110,24 @@ class LiveRuntime:
         if self.request is not None:
             self.request.cancel()
             await asyncio.gather(self.request, return_exceptions=True)
+        if self.enrichment is not None:
+            self.enrichment.cancel()
+            await asyncio.gather(self.enrichment, return_exceptions=True)
 
 
 async def run_live(config: Config, engine: Engine, archive=None):
     from .detector_process import ProcessDetector
     from .recognizer import Recognizer
+    from .tracklist import TracklistProvider
 
-    async with ProcessDetector(config) as detector, Recognizer() as recognizer:
-        runtime = LiveRuntime(config, engine, detector, recognizer, archive=archive)
+    async with (
+        ProcessDetector(config) as detector,
+        Recognizer() as recognizer,
+        TracklistProvider() as tracklists,
+    ):
+        runtime = LiveRuntime(
+            config, engine, detector, recognizer, archive=archive, tracklists=tracklists
+        )
         ticker = asyncio.create_task(runtime.tick())
         try:
             while True:

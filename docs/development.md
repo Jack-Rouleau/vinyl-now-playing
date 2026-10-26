@@ -11,6 +11,7 @@ python3.12 -m venv .venv
 node tests/test_display.cjs
 node tests/test_mosaic.cjs
 node tests/test_mosaic_refresh.cjs
+node tests/test_mosaic_delete.cjs
 .venv/bin/python -m build
 ```
 

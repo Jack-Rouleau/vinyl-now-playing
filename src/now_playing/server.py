@@ -1,4 +1,4 @@
-"""Small read-only local HTTP server with an explicit route allowlist."""
+"""Local display HTTP server with an explicit route allowlist."""
 
 import json
 import threading
@@ -7,6 +7,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from importlib.resources import files
 from urllib.parse import urlsplit
 
+from .albums import KEY
 from .models import DisplayState
 
 ASSETS = {
@@ -52,8 +53,30 @@ class Server:
         port=8080,
         albums=None,
         artwork=None,
+        delete_album=None,
     ):
         class Handler(BaseHTTPRequestHandler):
+            def do_DELETE(self):
+                origin = self.headers.get("Origin")
+                if (
+                    origin and origin != "http://" + self.headers.get("Host", "")
+                ) or self.headers.get("Sec-Fetch-Site") == "cross-site":
+                    self._send(403, "application/json", b'{"error":"Origin rejected"}')
+                    return
+                path = urlsplit(self.path).path
+                if not path.startswith("/api/albums/") or delete_album is None:
+                    self._send(404, "application/json", b'{"error":"Not found"}')
+                    return
+                key = path.removeprefix("/api/albums/")
+                if not KEY.fullmatch(key):
+                    self._send(400, "application/json", b'{"error":"Invalid album"}')
+                    return
+                try:
+                    delete_album(key)
+                    self._send(200, "application/json", b'{"deleted":true}')
+                except Exception:
+                    self._send(503, "application/json", b'{"error":"Album deletion unavailable"}')
+
             def do_GET(self):
                 self._respond(False)
 
@@ -62,6 +85,9 @@ class Server:
 
             def _respond(self, head):
                 code, mime, data = response_for(self.path, state, albums, artwork)
+                self._send(code, mime, data, head)
+
+            def _send(self, code, mime, data, head=False):
                 self.send_response(code)
                 self.send_header("Content-Type", mime)
                 self.send_header("Content-Length", str(len(data)))

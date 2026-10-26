@@ -14,7 +14,14 @@ class ServerTests(unittest.TestCase):
         self.assertEqual(mime, "application/json")
         self.assertEqual(
             json.loads(body),
-            {"status": "idle", "track": None, "revision": 7, "activity": "listening"},
+            {
+                "status": "idle",
+                "track": None,
+                "revision": 7,
+                "activity": "listening",
+                "next_track": None,
+                "inferred": False,
+            },
         )
         self.assertEqual(response_for("/../../config.toml", lambda: state)[0], 404)
         self.assertEqual(response_for("/missing", lambda: state)[0], 404)

@@ -74,6 +74,17 @@ class AlbumStore:
                 db.execute("UPDATE collection SET revision=revision+1 WHERE id=1")
         return key
 
+    def delete(self, key: str) -> bool:
+        if not KEY.fullmatch(key):
+            return False
+        with self.connect() as db:
+            deleted = db.execute("DELETE FROM albums WHERE id=?", (key,)).rowcount
+            if deleted:
+                db.execute("UPDATE collection SET revision=revision+1 WHERE id=1")
+        # Cached bytes may be in use by a concurrent download. Removing the row
+        # makes them inaccessible; a later recognition can safely reuse the path.
+        return bool(deleted)
+
     def snapshot(self) -> dict:
         with self.connect() as db:
             db.execute("BEGIN")

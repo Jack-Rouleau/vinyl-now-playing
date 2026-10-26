@@ -10,7 +10,8 @@
   <script src="/app.js" defer></script>
 </head>
 <body data-state="idle">
-  <div id="mosaic" aria-hidden="true" hidden></div>
+  <div id="mosaic" role="group" aria-label="Saved albums" hidden></div>
+  <div id="collection-message" role="status" hidden></div>
   <main>
     <section id="track" class="playing" aria-label="Current song" hidden>
       <img id="artwork" src="/artwork.svg" alt="Album artwork" width="800" height="800">
@@ -21,6 +22,10 @@
       </div>
     </section>
   </main>
+  <aside id="next-song" aria-live="polite" hidden>
+    <span class="next-label">Next song:</span>
+    <span id="next-title"></span>
+  </aside>
   <div id="activity" role="status" aria-live="polite">
     <span class="activity-dot" aria-hidden="true"></span>
     <span id="activity-text">Listening</span>

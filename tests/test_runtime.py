@@ -137,3 +137,63 @@ class RuntimeTests(unittest.IsolatedAsyncioTestCase):
         await runtime._recognize(token, np.zeros(160000))
         self.assertEqual(len(archive.tracks), 1)
         await runtime.close()
+
+    async def test_tracklist_lookup_does_not_delay_confirmed_song_or_apply_stale_data(self):
+        from now_playing.models import AlbumTrack
+
+        entered, release = asyncio.Event(), asyncio.Event()
+        song = Track("one", "First", "Artist", "Album", position_seconds=50)
+        following = Track("two", "Second", "Artist", "Album")
+
+        class Provider:
+            async def recognize(self, *_):
+                return song
+
+        class Metadata:
+            async def resolve(self, track):
+                entered.set()
+                await release.wait()
+                return (AlbumTrack(song, 100), AlbumTrack(following, 100))
+
+        engine = Engine(Config(), lambda: 0)
+        engine.observe(True)
+        engine.observe(True)
+        runtime = LiveRuntime(Config(), engine, None, Provider(), tracklists=Metadata())
+        await runtime._recognize(engine.begin_recognition(), np.zeros(160000))
+        self.assertEqual(engine.snapshot().track.title, "First")
+        await asyncio.wait_for(entered.wait(), 1)
+        engine.capture_failed()
+        release.set()
+        await runtime.enrichment
+        self.assertIsNone(engine.snapshot().track)
+        self.assertIsNone(engine.snapshot().next_track)
+        await runtime.close()
+
+    async def test_runtime_enriches_accepted_song_and_accounts_for_sample_length(self):
+        from now_playing.models import AlbumTrack
+
+        song = Track("one", "First", "Artist", "Album", position_seconds=70)
+        following = Track("two", "Second", "Artist", "Album")
+        now = [100.0]
+
+        class Provider:
+            async def recognize(self, *_):
+                now[0] = 105
+                return song
+
+        class Metadata:
+            async def resolve(self, track):
+                return (AlbumTrack(song, 100), AlbumTrack(following, 100))
+
+        engine = Engine(Config(), lambda: now[0])
+        engine.observe(True)
+        engine.observe(True)
+        runtime = LiveRuntime(Config(), engine, None, Provider(), tracklists=Metadata())
+        await runtime._recognize(engine.begin_recognition(), np.zeros(160000))
+        await runtime.enrichment
+        self.assertEqual(engine.snapshot().next_track.title, "Second")
+        now[0] = 120
+        engine.observe(True)
+        self.assertEqual(engine.snapshot().track.title, "Second")
+        self.assertTrue(engine.snapshot().inferred)
+        await runtime.close()

@@ -6,7 +6,7 @@ No Spotify account, playlists, or special display hardware. Recognition uses Sha
 
 ## Windows: install the app
 
-**[Download the Windows installer](https://github.com/Jack-Rouleau/vinyl-now-playing/releases/download/v0.2.0/Now-Playing-Windows-Setup.exe)** (Windows x64 preview, about 308 MB). The source-code ZIP from the green Code button is for developers; it is not the app installer.
+**[Download the Windows installer](https://github.com/Jack-Rouleau/vinyl-now-playing/releases/download/v0.3.0/Now-Playing-Windows-Setup.exe)** (Windows x64 preview, about 308 MB). The source-code ZIP from the green Code button is for developers; it is not the app installer.
 
 1. Open the installer and click **Install**.
 2. Open **Now Playing** from the Start menu.
@@ -102,6 +102,12 @@ The source launcher keeps everything inside the project folder:
 - `.now-playing/`: setup bookkeeping.
 
 The display fetches the collection again whenever it returns to the mosaic, so newly identified albums appear without restarting. Album history survives restarts. Stop the app and back up `data/` to preserve your collection; delete it to reset the collection.
+
+Click a mosaic cover once to show a translucent red removal confirmation with a trash icon, then click it again to remove the album. Click elsewhere or press Escape to cancel. All copies of that album disappear together. Playing and identifying the album again can save it again.
+
+For records played in order, the app looks up the recognized album's ordered songs and durations using Apple's public iTunes metadata service. It uses the recognition's playback position when available to follow the album through missed matches. Songs inferred from album timing show 💿 beside their title; successful recognition corrects the timeline. The bottom-right corner shows “Next song” when a following track is known. Sustained silence clears the timeline, and playback never loops automatically after the last track.
+
+Album inference depends on finding a complete matching digital edition. Missing metadata falls back to normal recognition. Vinyl editions can differ in order, gaps, or speed; without a playback position, timing starts conservatively at the first recognition and can be late. Track lists are cached in memory for the running session. The public [iTunes Search API](https://performance-partners.apple.com/search-api) requires no account or API key.
 
 Audio is held in memory rather than saved as recordings. Music detection runs locally; recognition sends a fingerprint derived from the sample to Shazam through ShazamIO. Album metadata and artwork persist locally, and cover downloads contact the artwork provider. Recognition is an unofficial third-party integration and can change or stop working. No account/API key is required by this app; it cannot guarantee a service quota. Requests are spaced ten seconds apart when music is detected, with backoff after failures.
 

@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict');
 require('../src/now_playing/web/mosaic.js');
-global.document={hidden:false,addEventListener(){}};
+global.document={hidden:false,addEventListener(){},getElementById(){return null;}};
 global.window={addEventListener(){}};
 global.matchMedia=()=>({matches:true,addEventListener(){}});
 const album=n=>({id:String(n),artwork_url:'/artwork/'+String(n).padStart(64,'0')});

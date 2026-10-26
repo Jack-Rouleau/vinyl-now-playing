@@ -51,9 +51,12 @@ class ConfigTests(unittest.TestCase):
                     "artist": "Artist",
                     "album": None,
                     "artwork_url": None,
+                    "position_seconds": None,
                 },
                 "revision": 1,
                 "activity": "listening",
+                "next_track": None,
+                "inferred": False,
             },
         )
 

@@ -61,7 +61,14 @@ async def run_application(
     artwork = store.artwork if store else None
     try:
         with shutdown_signals(asyncio.get_running_loop(), stop):
-            with Server(source.snapshot, config.host, config.port, albums=albums, artwork=artwork):
+            with Server(
+                source.snapshot,
+                config.host,
+                config.port,
+                albums=albums,
+                artwork=artwork,
+                delete_album=store.delete if store else None,
+            ):
                 browser_host = "127.0.0.1" if config.host == "0.0.0.0" else config.host
                 url = f"http://{browser_host}:{config.port}"
                 log.info(

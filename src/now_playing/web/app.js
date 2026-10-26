@@ -52,9 +52,12 @@
     const matched = status === 'matched' && state.track;
     document.body.dataset.state = status;
     get('track').hidden = !matched;
+    const next = matched && state.next_track && typeof state.next_track.title === 'string';
+    get('next-song').hidden = !next;
+    get('next-title').textContent = next ? state.next_track.title : '';
     if (mosaic) matched ? mosaic.hide() : mosaic.show();
     if (matched) {
-      get('title').textContent = state.track.title;
+      get('title').textContent = (state.inferred ? '💿 ' : '') + state.track.title;
       get('artist').textContent = state.track.artist;
       get('album').textContent = state.track.album || '';
       get('album').hidden = !state.track.album;

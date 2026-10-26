@@ -89,8 +89,40 @@ body[data-activity="paused"] .activity-dot { background: #a18c65; }
   left: 0;
   padding: 2px;
   overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
   transition: transform 1800ms cubic-bezier(.22,.61,.36,1);
 }
+.mosaic-tile:focus-visible { outline: 3px solid #fff; outline-offset: -5px; z-index: 1; }
+.mosaic-tile[data-confirm] { z-index: 1; transition: none; }
+.mosaic-tile[data-confirm]::after {
+  content: '🗑';
+  position: absolute;
+  inset: 2px;
+  display: grid;
+  place-items: center;
+  background: rgb(190 30 35 / 65%);
+  color: white;
+  font-size: clamp(40px, 5vw, 90px);
+}
+#collection-message {
+  position: fixed; top: 24px; left: 50%; transform: translateX(-50%);
+  z-index: 3; max-width: 90vw; padding: 12px 20px;
+  background: #121411ed; border-radius: 8px; text-align: center;
+}
+#next-song {
+  position: fixed;
+  right: clamp(24px, 5vw, 96px);
+  bottom: 24px;
+  max-width: 50vw;
+  text-align: right;
+  font-size: clamp(13px, 1.2vw, 22px);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.next-label { color: #909389; margin-right: .4em; }
 .mosaic-tile img { position: absolute; inset: 2px; width: calc(100% - 4px); height: calc(100% - 4px); object-fit: cover; }
 main { position: relative; pointer-events: none; }
 #activity { z-index: 2; }

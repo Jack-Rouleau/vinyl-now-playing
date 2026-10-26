@@ -23,6 +23,7 @@ jobs:
       - run: node tests/test_display.cjs
       - run: node tests/test_mosaic.cjs
       - run: node tests/test_mosaic_refresh.cjs
+      - run: node tests/test_mosaic_delete.cjs
       - run: python -m build
       - name: Install wheel in a clean environment and smoke test
         shell: bash

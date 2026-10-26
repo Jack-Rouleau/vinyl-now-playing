@@ -2,6 +2,7 @@
 
 import asyncio
 import io
+import math
 import wave
 
 from .artwork import safe_artwork_url
@@ -35,7 +36,13 @@ def parse_track(payload: dict) -> Track | None:
         for item in metadata if isinstance(metadata, list) else []:
             if isinstance(item, dict) and item.get("title") == "Album":
                 album = _text(item.get("text"))
-    return Track(key, title, artist, album, artwork)
+    position = None
+    matches = payload.get("matches")
+    if isinstance(matches, list) and matches and isinstance(matches[0], dict):
+        offset = matches[0].get("offset")
+        if type(offset) in (int, float) and math.isfinite(offset) and 0 <= offset <= 7200:
+            position = float(offset)
+    return Track(key, title, artist, album, artwork, position)
 
 
 def wav_bytes(samples, sample_rate: int) -> bytes:
